@@ -1,14 +1,14 @@
 {
-	"manifest_version": 2,
-	"name": "lets-watch",
-	"description": "A chrome extension for watching Disney+ Hoststar with your friends and family.",
-	"version": "1.0.0",
-	"content_scripts": [
-		{
-			"matches": ["https://www.hotstar.com/*"],
-			"js": ["socketioclient.js", "content.js"],
-			"css": ["style.css"]
-		}
-	],
-	"web_accessible_resources": ["style.css"]
+  "manifest_version": 2,
+  "name": "lets-watch",
+  "description": "A chrome extension for watching Disney+ Hoststar with your friends and family.",
+  "version": "1.0.0",
+  "content_scripts": [
+    {
+      "matches": ["https://www.apps.disneyplus.com/ph/*"],
+      "js": ["socketioclient.js", "content.js"],
+      "css": ["style.css"]
+    }
+  ],
+  "web_accessible_resources": ["style.css"]
 }
