@@ -5,7 +5,7 @@ let roomid;
 let iamhost = false;
 let allusersinroom = [];
 
-const socket = io('https://lets-party-server.herokuapp.com/');
+const socket = io('http://localhost:4000/');
 
 socket.on('whoami', function ({ id }) {
 	// console.log('myid', id);
@@ -42,6 +42,13 @@ function syncVideoStates() {
 	};
 	socket.emit('videoStates', { videoState, roomid });
 }
+
+function sendMessage (value) {
+	if (value !== '') {
+		console.log('Sent message: ', value)
+	}
+}
+
 
 // listen to hosts video player states
 
@@ -81,6 +88,7 @@ const nameinput = document.createElement('INPUT');
 const joinbutton = document.createElement('DIV');
 const closeBtn = document.createElement('div');
 
+
 hostbutton.id = 'host-btn';
 main_container.classList.add('main-container');
 start_container.classList.add('start-container');
@@ -96,9 +104,63 @@ input.placeholder = 'Enter room Code';
 joinbutton.id = 'join-btn';
 closeBtn.id = 'close-btn';
 
+// :: Message input properties
+const messageInput = document.createElement('input')
+messageInput.id = 'message-input'
+messageInput.placeholder = 'Send a message!'
+
+messageInput.addEventListener('keyup', (event) => {
+
+	if (event.target.value?.trim()) {
+		sendButton.classList.remove('disabled')
+
+		if (event.key === 'Enter' || event.keyCode === 13) {
+			sendMessage(event.target.value)
+			messageInput.value = ''
+			sendButton.className = 'disabled'
+		}
+	} else {
+		if (!sendButton.classList.contains('disabled')) {
+			sendButton.className = 'disabled'
+		}
+	}
+})
+
+messageInput.addEventListener('change', (event) => {
+	if (event.target.value?.trim()) {
+		sendButton.classList.remove('disabled')
+
+	} else {
+		if (!sendButton.classList.contains('disabled')) {
+			sendButton.className = 'disabled'
+		}
+	}
+})
+
+// :: Message bubble properties
+const messageBubble = document.createElement('div')
+messageBubble.id = 'message-bubble'
+
+// :: Message send button properties
+const sendButton = document.createElement('div')
+sendButton.id = 'send-button'
+sendButton.className = 'disabled'
+sendButton.innerHTML = 'Send message'
+
+sendButton.addEventListener('click', (event) => {
+	sendMessage(messageInput.value)
+
+	if (messageInput.value) {
+		sendButton.className = 'disabled'
+	}
+	messageInput.value = ''
+})
+
+
 roomlabel.innerHTML = `OR`;
 joinbutton.innerHTML = `Join`;
 closeBtn.innerHTML = '❌';
+
 
 start_container.appendChild(letspartytitle);
 start_container.appendChild(hostbutton);
@@ -150,6 +212,8 @@ socket.on('joinmetothisroomsuccess', (msg) => {
 	joinbutton.style.display = 'none';
 	hostbutton.style.display = 'none';
 	nameinput.style.display = 'none';
+	start_container.appendChild(messageInput)
+	start_container.appendChild(sendButton)
 
 	status.innerHTML = `Room Code: <br> ${thecode} <br> Tell everyone to join here! <br> <br> <br>`;
 
