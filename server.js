@@ -29,6 +29,10 @@ io.on('connection', (socket) => {
 		io.to(roomid).emit('msg', data);
 	});
 
+	socket.on('sendMessage', ({ roomId, ...args }) => {
+		io.to(roomId).emit('newMessage', args)
+	})
+
 	// get video state
 	socket.on('videoStates', ({ videoState, roomid }) => {
 		io.to(roomid).emit('videoStates', videoState);
