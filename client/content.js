@@ -4,12 +4,15 @@ let myid;
 let roomid;
 let iamhost = false;
 let allusersinroom = [];
+let messages = []
+let myId;
 
 const socket = io('http://localhost:4000/');
 
 socket.on('whoami', function ({ id }) {
 	// console.log('myid', id);
 	myid = id;
+	myId = new Date().getTime()
 });
 
 function checkIsAdPlayng() {
@@ -41,12 +44,6 @@ function syncVideoStates() {
 		isHostPaused: videoplayer?.paused,
 	};
 	socket.emit('videoStates', { videoState, roomid });
-}
-
-function sendMessage (value) {
-	if (value !== '') {
-		console.log('Sent message: ', value)
-	}
 }
 
 
@@ -126,20 +123,9 @@ messageInput.addEventListener('keyup', (event) => {
 	}
 })
 
-messageInput.addEventListener('change', (event) => {
-	if (event.target.value?.trim()) {
-		sendButton.classList.remove('disabled')
-
-	} else {
-		if (!sendButton.classList.contains('disabled')) {
-			sendButton.className = 'disabled'
-		}
-	}
-})
-
 // :: Message bubble properties
 const messageBubble = document.createElement('div')
-messageBubble.id = 'message-bubble'
+messageBubble.className = 'message-bubble'
 
 // :: Message send button properties
 const sendButton = document.createElement('div')
@@ -155,6 +141,10 @@ sendButton.addEventListener('click', (event) => {
 	}
 	messageInput.value = ''
 })
+
+// :: Messages container
+const messageContainer = document.createElement('div')
+messageContainer.className = 'messages-container'
 
 
 roomlabel.innerHTML = `OR`;
@@ -243,8 +233,27 @@ socket.on('who_joined', (allusers) => {
 	}
 });
 
+// socket.on('newMessage', (payload) => {
+// 	if (payload.authorId)
+// })
+
+function sendMessage (value) {
+	if (value !== '') {
+		console.log('Sent message: ', value)
+		const message = {
+			authorId: myId,
+			text: value,
+			authorName: nameinput.value,
+			roomId: myid
+		}
+		status.innerHTML += `${nameinput.value} says: ${value} </br>`
+		socket.emit('sendMessage', message)
+	}
+}
+
 socket.on('msg', (msg) => {
 	console.log(msg);
 });
 
 document.querySelector('body').appendChild(main_container);
+
