@@ -1,7 +1,7 @@
 let videoplayer;
 let adTimer;
 let myid;
-let roomid;
+let roomId;
 let iamhost = false;
 let allusersinroom = [];
 let messages = []
@@ -28,14 +28,15 @@ function getVideoPlayer() {
 	clearInterval(adTimer);
 
 	videoplayer = document.querySelector('video');
-	videoplayer.removeAttribute('autoplay');
+
+	if (videoplayer) {
+		videoplayer.removeAttribute('autoplay');
+	}
 
 	//keep listening to the hosts videoplayer events, only host can control the play pause and seek
-	if (iamhost) {
-		setInterval(() => {
-			syncVideoStates();
-		}, 1000);
-	}
+	setInterval(() => {
+		syncVideoStates();
+	}, 1000);
 }
 
 function syncVideoStates() {
@@ -43,7 +44,7 @@ function syncVideoStates() {
 		hosttime: videoplayer?.currentTime,
 		isHostPaused: videoplayer?.paused,
 	};
-	socket.emit('videoStates', { videoState, roomid });
+	socket.emit('videoStates', { videoState, roomId });
 }
 
 
@@ -169,8 +170,8 @@ document.querySelector('body').appendChild(main_container);
 hostbutton.addEventListener('click', () => {
 	if (nameinput.value !== '') {
 		localStorage.setItem('lets_party_uname', nameinput.value);
-		socket.emit('joinmetothisroom', { roomid: myid, name: nameinput.value });
-		roomid = myid;
+		socket.emit('joinmetothisroom', { roomId: myid, name: nameinput.value });
+		roomId = myid;
 		iamhost = true;
 	} else {
 		alert('Enter your display name');
@@ -181,10 +182,10 @@ joinbutton.addEventListener('click', () => {
 	if (input.value !== '' && nameinput.value !== '') {
 		localStorage.setItem('lets_party_uname', nameinput.value);
 		socket.emit('joinmetothisroom', {
-			roomid: input.value,
+			roomId: input.value,
 			name: nameinput.value,
 		});
-		roomid = input.value;
+		roomId = input.value;
 	} else {
 		alert('Enter your Code and Display Name');
 	}
@@ -205,10 +206,10 @@ socket.on('joinmetothisroomsuccess', (msg) => {
 	start_container.appendChild(messageInput)
 	start_container.appendChild(sendButton)
 
-	status.innerHTML = `Room Code: <br> ${thecode} <br> Tell everyone to join here! <br> <br> <br>`;
+	status.innerHTML = `Room Code: <br> <p id="code">${thecode}</p> <br> Tell everyone to join here! <br> <br> <br>`;
 
 	/* 	setTimeout(() => {
-		socket.emit('msg', { data: 'hey', roomid });
+		socket.emit('msg', { data: 'hey', roomId });
 	}, 10000); */
 
 	checkIsAdPlayng();
@@ -220,7 +221,7 @@ socket.on('someonejoined', (name) => {
 		allusersinroom.push(name);
 		socket.emit('tell_everyone_who_joined', {
 			allusers: allusersinroom,
-			roomid,
+			roomId,
 		});
 	}
 });
@@ -233,18 +234,19 @@ socket.on('who_joined', (allusers) => {
 	}
 });
 
-// socket.on('newMessage', (payload) => {
-// 	if (payload.authorId)
-// })
+socket.on('newMessage', (payload) => {
+	if (payload.authorId !== myId) {
+		status.innerHTML += `${payload.authorName} says: ${payload.text} </br>`
+	}
+})
 
 function sendMessage (value) {
 	if (value !== '') {
-		console.log('Sent message: ', value)
 		const message = {
 			authorId: myId,
 			text: value,
 			authorName: nameinput.value,
-			roomId: myid
+			roomId: roomId
 		}
 		status.innerHTML += `${nameinput.value} says: ${value} </br>`
 		socket.emit('sendMessage', message)
