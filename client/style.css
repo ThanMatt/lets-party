@@ -79,6 +79,8 @@
 }
 
 #status-container {
+  height: 65vh;
+  overflow-y: auto;
   position: relative;
   width: 92%;
   font-size: 15px;
@@ -111,4 +113,8 @@
 
 .disabled {
   background: gray !important;
+}
+
+#code {
+  user-select: all;
 }
