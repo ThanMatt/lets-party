@@ -194,8 +194,8 @@ closeBtn.addEventListener('click', () => {
   main_container.style.right = '-100%'
 })
 
-socket.on('joinmetothisroomsuccess', ({ roomId, inviteUrl }) => {
-  const roomCode = `<code class="roomcode">${inviteUrl}</code>`
+socket.on('joinmetothisroomsuccess', ({ inviteUrl }) => {
+  const roomCode = `<textarea class="roomcode">${inviteUrl}</textarea>`
 
   roomlabel.style.display = 'none'
   input.style.display = 'none'
@@ -205,7 +205,7 @@ socket.on('joinmetothisroomsuccess', ({ roomId, inviteUrl }) => {
   start_container.appendChild(messageInput)
   start_container.appendChild(sendButton)
 
-  status.innerHTML = `Room Code: <br> <p id="code">${roomCode}</p> <br> Tell everyone to join here! <br>`
+  status.innerHTML = `Room Code: <br>${roomCode} <br/> Tell everyone to join here! <br>`
 
   /* 	setTimeout(() => {
 		socket.emit('msg', { data: 'hey', roomId });
