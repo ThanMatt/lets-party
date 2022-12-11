@@ -13,25 +13,31 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
 	socket.emit('whoami', { id: socket.id });
 	// join to the room
-	socket.on('joinmetothisroom', ({ roomid, name }) => {
-		socket.join(roomid);
-		socket.emit('joinmetothisroomsuccess', `${roomid} `);
-		io.to(roomid).emit('someonejoined', name);
+	socket.on('joinmetothisroom', ({ roomId, name }) => {
+		socket.join(roomId);
+		socket.emit('joinmetothisroomsuccess', `${roomId} `);
+		io.to(roomId).emit('someonejoined', name);
 	});
 
 	// tell everyone who are here in the room
-	socket.on('tell_everyone_who_joined', ({ allusers, roomid }) => {
-		io.to(roomid).emit('who_joined', allusers);
+	socket.on('tell_everyone_who_joined', ({ allusers, roomId }) => {
+		io.to(roomId).emit('who_joined', allusers);
 	});
 
 	// check connection
-	socket.on('msg', ({ data, roomid }) => {
-		io.to(roomid).emit('msg', data);
+	socket.on('msg', ({ data, roomId }) => {
+		io.to(roomId).emit('msg', data);
 	});
 
+	socket.on('sendMessage', ({ roomId, ...args }) => {
+		console.log('Room ID: ', roomId)
+		console.log('Message payload: ', args)
+		io.to(roomId).emit('newMessage', args)
+	})
+
 	// get video state
-	socket.on('videoStates', ({ videoState, roomid }) => {
-		io.to(roomid).emit('videoStates', videoState);
+	socket.on('videoStates', ({ videoState, roomId }) => {
+		io.to(roomId).emit('videoStates', videoState);
 	});
 
 	// disconnect
