@@ -21,10 +21,13 @@ app.get('/watch/:id', (req, res) => {
   let decryptedData = decipher.update(req.params.id, 'hex', 'utf-8')
 
   decryptedData += decipher.final('utf8')
-  return res.send({
+
+  console.log({
     decrypted: decryptedData,
     query: req.query
   })
+
+  return res.redirect(`${decryptedData}#${req.query.room_code}`)
 })
 
 io.on('connection', (socket) => {
